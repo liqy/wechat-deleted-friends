@@ -5,7 +5,8 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.liqingyi.wechat.deleted.friends.misc.OkHttpStack;
-import com.squareup.okhttp.OkHttpClient;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by liqin on 2016/1/6.

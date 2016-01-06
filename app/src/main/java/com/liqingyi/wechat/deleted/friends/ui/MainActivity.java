@@ -33,33 +33,34 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                waitLogin();
+                waitForLogin();
             }
 
             @Override
             public void onFinish() {
-                waitLogin();
+                waitForLogin();
             }
         };
-        loginChat();
+
+        getUUID();
     }
 
-    public void loginChat() {
+    public void getUUID() {
         String url = "https://login.weixin.qq.com/jslogin?appid=%1$s&fun=%2$s&lang=%3$s";
         StringRequest request = new StringRequest(Method.GET,
                 String.format(url, "wx782c26e4c19acffb", "new", "zh_CN"),
-                createLoginReqSuccessListener(),
+                createUUIDReqSuccessListener(),
                 createReqErrorListener());
         VolleyClient.getRequestQueue().add(request);
     }
 
-    public void qrCode() {
+    public void showQRImage() {
         String url = "https://login.weixin.qq.com/qrcode/%1$s?t=%2$s";
         Glide.with(this).load(String.format(url, uuid, "webwx")).into(codeImage);
         timer.start();
     }
 
-    public void waitLogin() {
+    public void waitForLogin() {
         String url = "https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?tip=%1$s&uuid=%2$s";
         StringRequest request = new StringRequest(Method.GET,
                 String.format(url, tip, uuid),
@@ -68,24 +69,55 @@ public class MainActivity extends BaseActivity {
         VolleyClient.getRequestQueue().add(request);
     }
 
-    public void login(){
+    public void login() {
         StringRequest request = new StringRequest(Method.GET,
                 redirect_uri,
-                createReqSuccessListener(),
+                createLoginReqSuccessListener(),
                 createReqErrorListener());
         VolleyClient.getRequestQueue().add(request);
     }
 
-    private Response.Listener<String> createReqSuccessListener() {
-        return new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i(getLocalClassName(), response);
-            }
-        };
+    public void webWXInit() {
+        StringRequest request = new StringRequest(Method.GET,
+                redirect_uri,
+                createInitReqSuccessListener(),
+                createReqErrorListener());
+        VolleyClient.getRequestQueue().add(request);
     }
 
-    private Response.Listener<String> createLoginReqSuccessListener() {
+    public void webWXGetContact() {
+        StringRequest request = new StringRequest(Method.GET,
+                redirect_uri,
+                createGetContactReqSuccessListener(),
+                createReqErrorListener());
+        VolleyClient.getRequestQueue().add(request);
+    }
+
+    public void createChatRoom() {
+        StringRequest request = new StringRequest(Method.GET,
+                redirect_uri,
+                createChatRoomReqSuccessListener(),
+                createReqErrorListener());
+        VolleyClient.getRequestQueue().add(request);
+    }
+
+    public void deleteMember() {
+        StringRequest request = new StringRequest(Method.GET,
+                redirect_uri,
+                createDeleteReqSuccessListener(),
+                createReqErrorListener());
+        VolleyClient.getRequestQueue().add(request);
+    }
+
+    public void addMember() {
+        StringRequest request = new StringRequest(Method.GET,
+                redirect_uri,
+                createAddReqSuccessListener(),
+                createReqErrorListener());
+        VolleyClient.getRequestQueue().add(request);
+    }
+
+    private Response.Listener<String> createUUIDReqSuccessListener() {
         return new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -100,17 +132,10 @@ public class MainActivity extends BaseActivity {
                 Log.i(getLocalClassName(), code);
                 Log.i(getLocalClassName(), uuid);
                 if ("200".equals(code)) {
-                    qrCode();
+                    showQRImage();
                 }
             }
         };
-    }
-
-    public String finStr(String find, String response) {
-        Pattern pattern = Pattern.compile(find);
-        Matcher matcher = pattern.matcher(response);
-        matcher.find();
-        return matcher.group(1);
     }
 
     private Response.Listener<String> createCodeReqSuccessListener() {
@@ -141,4 +166,57 @@ public class MainActivity extends BaseActivity {
         };
     }
 
+    private Response.Listener<String> createLoginReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
+
+    private Response.Listener<String> createInitReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
+
+    private Response.Listener<String> createGetContactReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
+
+    private Response.Listener<String> createChatRoomReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
+
+    private Response.Listener<String> createDeleteReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
+
+    private Response.Listener<String> createAddReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+            }
+        };
+    }
 }
