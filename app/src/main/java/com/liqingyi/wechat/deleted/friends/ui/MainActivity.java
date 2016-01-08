@@ -5,16 +5,20 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.liqingyi.wechat.deleted.friends.R;
 import com.liqingyi.wechat.deleted.friends.model.*;
 import com.liqingyi.wechat.deleted.friends.model.Error;
 import com.liqingyi.wechat.deleted.friends.util.VolleyClient;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +33,8 @@ public class MainActivity extends BaseActivity {
     int tip = 1;
     String redirect_uri;
     String base_uri;
+    Error error;
+    BaseRequest baseRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,16 +90,26 @@ public class MainActivity extends BaseActivity {
     }
 
     public void webWXInit() {
-        StringRequest request = new StringRequest(Method.GET,
-                redirect_uri,
+        String url = base_uri + "/webwxinit?pass_ticket=%1$s&skey=%2$s&r=%3$s";
+        StringRequest request = new StringRequest(Method.POST,
+                String.format(url, error.pass_ticket, error.skey, System.currentTimeMillis()),
                 createInitReqSuccessListener(),
-                createReqErrorListener());
+                createReqErrorListener()) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("BaseRequest", new Gson().toJson(baseRequest));
+                return params;
+            }
+        };
+
         VolleyClient.getRequestQueue().add(request);
     }
 
     public void webWXGetContact() {
+        String url = base_uri + "/webwxgetcontact?pass_ticket=%1$s&skey=%2$s&r=%3$s";
         StringRequest request = new StringRequest(Method.GET,
-                redirect_uri,
+                String.format(url, error.pass_ticket, error.skey, System.currentTimeMillis()),
                 createGetContactReqSuccessListener(),
                 createReqErrorListener());
         VolleyClient.getRequestQueue().add(request);
@@ -180,8 +196,10 @@ public class MainActivity extends BaseActivity {
                 try {
                     Xml xml = new Xml.Builder().build();
                     XmlAdapter<Error> xmlAdapter = xml.adapter(Error.class);
-                    Error error = xmlAdapter.fromXml(response);
-                    Log.i(getLocalClassName(),error.toString());
+                    error = xmlAdapter.fromXml(response);
+                    Log.i(getLocalClassName(), error.toString());
+                    baseRequest = new BaseRequest(error);
+                    webWXInit();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -194,6 +212,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onResponse(String response) {
                 Log.i(getLocalClassName(), response);
+                webWXGetContact();
             }
         };
     }
