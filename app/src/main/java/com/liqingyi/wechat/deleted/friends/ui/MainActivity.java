@@ -10,10 +10,16 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.liqingyi.wechat.deleted.friends.R;
+import com.liqingyi.wechat.deleted.friends.model.*;
+import com.liqingyi.wechat.deleted.friends.model.Error;
 import com.liqingyi.wechat.deleted.friends.util.VolleyClient;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import me.tatarka.parsnip.Xml;
+import me.tatarka.parsnip.XmlAdapter;
 
 public class MainActivity extends BaseActivity {
 
@@ -171,6 +177,14 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onResponse(String response) {
                 Log.i(getLocalClassName(), response);
+                try {
+                    Xml xml = new Xml.Builder().build();
+                    XmlAdapter<Error> xmlAdapter = xml.adapter(Error.class);
+                    Error error = xmlAdapter.fromXml(response);
+                    Log.i(getLocalClassName(),error.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
