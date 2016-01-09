@@ -30,4 +30,6 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.0.0-RC1'
     compile 'me.tatarka.parsnip:parsnip:0.2'
     compile 'com.google.code.gson:gson:2.5'
+    compile 'com.jcodecraeer:xrecyclerview:1.2.6'
+
 }
