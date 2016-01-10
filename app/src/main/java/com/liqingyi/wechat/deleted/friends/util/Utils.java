@@ -26,8 +26,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -71,7 +69,9 @@ public class Utils {
         if (!appDir.exists()) {
             appDir.mkdir();
         } else {
-
+            for (File file : appDir.listFiles()) {
+                file.delete();
+            }
         }
         String fileName = System.currentTimeMillis() + ".jpg";
         File file = new File(appDir, fileName);

@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
@@ -39,11 +40,14 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initBar();
+
         codeImage = (ImageView) findViewById(R.id.codeImage);
         codeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Utils.saveImageToGallery(MainActivity.this, Utils.drawableToBitmap(codeImage.getDrawable()));
+                Toast.makeText(MainActivity.this,"刚快按照使用说明操作吧",Toast.LENGTH_SHORT).show();
             }
         });
         timer = new CountDownTimer(60000, 5000) {
@@ -58,10 +62,8 @@ public class MainActivity extends BaseActivity {
                 waitForLogin();
             }
         };
-
         getUUID();
     }
-
 
     public void getUUID() {
         String url = "https://login.weixin.qq.com/jslogin?appid=%1$s&fun=%2$s&lang=%3$s&_=%4$s";

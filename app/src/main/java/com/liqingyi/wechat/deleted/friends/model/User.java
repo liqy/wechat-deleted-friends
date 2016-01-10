@@ -50,6 +50,8 @@ public class User implements Parcelable {
      */
     public String MemberStatus;
 
+    public boolean isCheck;
+
     @Override
     public String toString() {
         return "User{" +

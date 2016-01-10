@@ -2,9 +2,11 @@ package com.liqingyi.wechat.deleted.friends.ui;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -35,6 +37,7 @@ public class MemberListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_list);
+        initBar();
 
         error = getIntent().getParcelableExtra("Error");
         param = getIntent().getParcelableExtra("BaseParam");
@@ -53,7 +56,7 @@ public class MemberListActivity extends BaseActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setRefreshingColorResources(android.R.color.holo_orange_light, android.R.color.holo_blue_light, android.R.color.holo_green_light, android.R.color.holo_red_light);
-        memberAdapter = new MemberAdapter();
+        memberAdapter = new MemberAdapter(this, base_uri);
         memberAdapter.setHasStableIds(true);
         recyclerView.setAdapter(memberAdapter);
 
@@ -65,6 +68,12 @@ public class MemberListActivity extends BaseActivity {
         }));
 
         webWXInit();
+    }
+
+    @Override
+    public void initBar() {
+        super.initBar();
+        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     public void webWXInit() {
@@ -89,8 +98,9 @@ public class MemberListActivity extends BaseActivity {
         VolleyClient.getRequestQueue().add(request);
     }
 
-    public void createChatRoom() {
+    public void createChatRoom(ArrayList<User> list) {
         String url = base_uri + "/webwxcreatechatroom?pass_ticket=%1$s&r=%2$s";
+        param.MemberList = list;
         String body = new Gson().toJson(param);
         JsonStringRequest request = new JsonStringRequest(Request.Method.POST,
                 String.format(url, error.pass_ticket, System.currentTimeMillis()),
@@ -100,9 +110,12 @@ public class MemberListActivity extends BaseActivity {
         VolleyClient.getRequestQueue().add(request);
     }
 
-    public void addMember(String chatRoomName, String userNames) {
-        param.ChatRoomName = chatRoomName;
-        param.AddMemberList = userNames;
+    public void addMember(ArrayList<User> list) {
+        String userNames = "";
+        for (User user : list) {
+            userNames += user.UserName + ",";
+        }
+        param.AddMemberList = userNames.substring(0, userNames.length() - 1);
         String url = base_uri + "/webwxupdatechatroom?fun=addmember&pass_ticket=%1$s";
         String body = new Gson().toJson(param);
         JsonStringRequest request = new JsonStringRequest(Request.Method.POST,
@@ -113,9 +126,12 @@ public class MemberListActivity extends BaseActivity {
         VolleyClient.getRequestQueue().add(request);
     }
 
-    public void deleteMember(String chatRoomName, String userNames) {
-        param.ChatRoomName = chatRoomName;
-        param.DelMemberList = userNames;
+    public void deleteMember(ArrayList<User> list) {
+        String userNames = "";
+        for (User user : list) {
+            userNames += user.UserName + ",";
+        }
+        param.DelMemberList = userNames.substring(0, userNames.length() - 1);
         String url = base_uri + "/webwxupdatechatroom?fun=delmember&pass_ticket=%1$s";
         String body = new Gson().toJson(param);
         JsonStringRequest request = new JsonStringRequest(Request.Method.POST,
@@ -148,14 +164,18 @@ public class MemberListActivity extends BaseActivity {
     }
 
     public void createRoom() {
-        ArrayList<User> list = memberAdapter.getMembers();
-
+        ArrayList<User> list = memberAdapter.getSelectMembers();
+        //已选择的群组成员
         param.MemberCount = list.size();
-        param.MemberList = list;
         if (param.MemberCount > 1) {
-            createChatRoom();
+            if (TextUtils.isEmpty(param.ChatRoomName)) {
+                createChatRoom(list);
+            } else {
+                addMember(list);
+            }
+        } else {
+            Toast.makeText(MemberListActivity.this, "点击选择好友之后再点，不要这么着急...", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private Response.Listener<String> createChatRoomReqSuccessListener() {
@@ -165,21 +185,8 @@ public class MemberListActivity extends BaseActivity {
                 Log.i(getLocalClassName(), response);
                 Gson gson = new Gson();
                 ResponseData data = gson.fromJson(response, ResponseData.class);
-                String userNames = "";
-                for (User user : data.MemberList) {
-                    userNames += user.UserName + ",";
-                }
-
-                deleteMember(data.ChatRoomName, userNames.substring(0,userNames.length()-1));
-            }
-        };
-    }
-
-    private Response.Listener<String> createDeleteReqSuccessListener() {
-        return new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i(getLocalClassName(), response);
+                param.ChatRoomName = data.ChatRoomName;
+                deleteMember(data.MemberList);
             }
         };
     }
@@ -189,6 +196,20 @@ public class MemberListActivity extends BaseActivity {
             @Override
             public void onResponse(String response) {
                 Log.i(getLocalClassName(), response);
+                Gson gson = new Gson();
+                ResponseData data = gson.fromJson(response, ResponseData.class);
+                deleteMember(data.MemberList);
+            }
+        };
+    }
+
+
+    private Response.Listener<String> createDeleteReqSuccessListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(getLocalClassName(), response);
+                memberAdapter.resetMembers();
             }
         };
     }
