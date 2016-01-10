@@ -1,5 +1,6 @@
 package com.liqingyi.wechat.deleted.friends.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
@@ -32,6 +33,9 @@ public class MemberListActivity extends BaseActivity {
     BaseParam param;
     String base_uri;
     Button createRoom;
+    Button blackRoom;
+
+    ArrayList<String> blackList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +48,30 @@ public class MemberListActivity extends BaseActivity {
         base_uri = getIntent().getStringExtra("base_uri");
 
         createRoom = (Button) findViewById(R.id.createRoom);
+        blackRoom = (Button) findViewById(R.id.blackRoom);
         createRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createRoom();
+            }
+        });
+        blackRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (blackList == null || blackList.isEmpty()) {
+                    Toast.makeText(MemberListActivity.this, "你的好友和你的关系都很亲密，你可以放心和小伙伴玩耍了", Toast.LENGTH_SHORT).show();
+                } else {
+                    ArrayList<User> blackUsers = new ArrayList<User>();
+                    for (String userName : blackList) {
+                        if (memberAdapter.getMemberMap().containsKey(userName)) {
+                            blackUsers.add(memberAdapter.getMemberMap().get(userName));
+                        }
+                    }
+                    Intent intent = new Intent(MemberListActivity.this, BlackRoomActivity.class);
+                    intent.putExtra("base_uri", base_uri);
+                    intent.putParcelableArrayListExtra("blackUsers", blackUsers);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -74,6 +98,7 @@ public class MemberListActivity extends BaseActivity {
     public void initBar() {
         super.initBar();
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setTitle("开始选人");
     }
 
     public void webWXInit() {
@@ -115,7 +140,8 @@ public class MemberListActivity extends BaseActivity {
         for (User user : list) {
             userNames += user.UserName + ",";
         }
-        param.AddMemberList = userNames.substring(0, userNames.length() - 1);
+        if (!TextUtils.isEmpty(userNames))
+            param.AddMemberList = userNames.substring(0, userNames.length() - 1);
         String url = base_uri + "/webwxupdatechatroom?fun=addmember&pass_ticket=%1$s";
         String body = new Gson().toJson(param);
         JsonStringRequest request = new JsonStringRequest(Request.Method.POST,
@@ -128,10 +154,20 @@ public class MemberListActivity extends BaseActivity {
 
     public void deleteMember(ArrayList<User> list) {
         String userNames = "";
+        if (blackList == null) {
+            blackList = new ArrayList<>();
+        }
+
         for (User user : list) {
             userNames += user.UserName + ",";
+
+            if (user.MemberStatus == 4) {
+                blackList.add(user.UserName);
+            }
+
         }
-        param.DelMemberList = userNames.substring(0, userNames.length() - 1);
+        if (!TextUtils.isEmpty(userNames))
+            param.DelMemberList = userNames.substring(0, userNames.length() - 1);
         String url = base_uri + "/webwxupdatechatroom?fun=delmember&pass_ticket=%1$s";
         String body = new Gson().toJson(param);
         JsonStringRequest request = new JsonStringRequest(Request.Method.POST,
@@ -140,6 +176,7 @@ public class MemberListActivity extends BaseActivity {
                 createDeleteReqSuccessListener(),
                 createReqErrorListener());
         VolleyClient.getRequestQueue().add(request);
+
     }
 
     private Response.Listener<String> createInitReqSuccessListener() {

@@ -48,7 +48,7 @@ public class User implements Parcelable {
     /**
      * 4:被好友删除了
      */
-    public String MemberStatus;
+    public int MemberStatus;
 
     public boolean isCheck;
 
@@ -106,7 +106,7 @@ public class User implements Parcelable {
         dest.writeInt(this.ChatRoomId);
         dest.writeString(this.KeyWord);
         dest.writeString(this.EncryChatRoomId);
-        dest.writeString(this.MemberStatus);
+        dest.writeInt(this.MemberStatus);
     }
 
     protected User(Parcel in) {
@@ -141,7 +141,7 @@ public class User implements Parcelable {
         this.ChatRoomId = in.readInt();
         this.KeyWord = in.readString();
         this.EncryChatRoomId = in.readString();
-        this.MemberStatus = in.readString();
+        this.MemberStatus = in.readInt();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {

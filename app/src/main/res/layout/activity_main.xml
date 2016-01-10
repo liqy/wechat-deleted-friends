@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right|center_vertical"
                 android:padding="10dp"
-                android:text="心理承受能力差的,请谨慎适用\n请在一分钟之内完成扫码操作\n再试一次，请重新进入应用"
+                android:text="心理承受能力差的,请谨慎适用\n请在一分钟之内完成扫码操作"
                 android:textColor="@color/my_schedule_conflict" />
         </LinearLayout>
     </ScrollView>

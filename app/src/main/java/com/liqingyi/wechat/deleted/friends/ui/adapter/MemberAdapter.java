@@ -8,10 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.liqingyi.wechat.deleted.friends.R;
 import com.liqingyi.wechat.deleted.friends.model.User;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Created by liqy on 16/1/9.
@@ -22,16 +25,23 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder
     ArrayList<User> selectMembers;
     Activity activity;
     public String base_uri;
+    Map<String, User> memberMap;
 
-    public MemberAdapter(Activity activity,String base_uri) {
+    public MemberAdapter(Activity activity, String base_uri) {
         this.activity = activity;
-        this.base_uri=base_uri;
+        this.base_uri = base_uri;
         this.users = new ArrayList<>();
         this.selectMembers = new ArrayList<>();
+        this.memberMap = new Hashtable<>();
     }
 
     public void addMember(ArrayList<User> list) {
         this.users.addAll(list);
+
+        for (User user : list) {
+            memberMap.put(user.UserName, user);
+        }
+
         notifyDataSetChanged();
     }
 
@@ -52,6 +62,10 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder
 
     public void resetMembers() {
         this.selectMembers.clear();
+    }
+
+    public Map<String, User> getMemberMap() {
+        return memberMap;
     }
 
     @Override
