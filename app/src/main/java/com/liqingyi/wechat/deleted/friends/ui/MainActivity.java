@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.android.volley.Request.Method;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.liqingyi.wechat.deleted.friends.R;
 import com.liqingyi.wechat.deleted.friends.model.*;
 import com.liqingyi.wechat.deleted.friends.model.BaseError;
+import com.liqingyi.wechat.deleted.friends.util.Utils;
 import com.liqingyi.wechat.deleted.friends.util.VolleyClient;
 
 import java.io.IOException;
@@ -38,6 +40,12 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         codeImage = (ImageView) findViewById(R.id.codeImage);
+        codeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.saveImageToGallery(MainActivity.this, Utils.drawableToBitmap(codeImage.getDrawable()));
+            }
+        });
         timer = new CountDownTimer(60000, 5000) {
 
             @Override
@@ -53,6 +61,7 @@ public class MainActivity extends BaseActivity {
 
         getUUID();
     }
+
 
     public void getUUID() {
         String url = "https://login.weixin.qq.com/jslogin?appid=%1$s&fun=%2$s&lang=%3$s&_=%4$s";
@@ -85,7 +94,6 @@ public class MainActivity extends BaseActivity {
                 createReqErrorListener());
         VolleyClient.getRequestQueue().add(request);
     }
-
 
 
     private Response.Listener<String> createUUIDReqSuccessListener() {
@@ -149,10 +157,10 @@ public class MainActivity extends BaseActivity {
                     BaseRequest baseRequest = new BaseRequest(baseError);
                     param = new BaseParam(baseRequest);
 
-                    Intent intent=new Intent(MainActivity.this,MemberListActivity.class);
+                    Intent intent = new Intent(MainActivity.this, MemberListActivity.class);
                     intent.putExtra("Error", baseError);
-                    intent.putExtra("BaseParam",param);
-                    intent.putExtra("base_uri",base_uri);
+                    intent.putExtra("BaseParam", param);
+                    intent.putExtra("base_uri", base_uri);
                     startActivity(intent);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -160,9 +168,5 @@ public class MainActivity extends BaseActivity {
             }
         };
     }
-
-
-
-
 
 }

@@ -9,7 +9,6 @@ import android.widget.Button;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.google.gson.Gson;
-import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.liqingyi.wechat.deleted.friends.ui.adapter.MemberAdapter;
 import com.liqingyi.wechat.deleted.friends.R;
 import com.liqingyi.wechat.deleted.friends.model.BaseError;
@@ -19,12 +18,13 @@ import com.liqingyi.wechat.deleted.friends.model.User;
 import com.liqingyi.wechat.deleted.friends.util.JsonStringRequest;
 import com.liqingyi.wechat.deleted.friends.util.RecyclerUtils;
 import com.liqingyi.wechat.deleted.friends.util.VolleyClient;
+import com.malinskiy.superrecyclerview.SuperRecyclerView;
 
 import java.util.ArrayList;
 
 public class MemberListActivity extends BaseActivity {
 
-    private XRecyclerView recyclerView;
+    private SuperRecyclerView recyclerView;
     private MemberAdapter memberAdapter;
     BaseError error;
     BaseParam param;
@@ -48,11 +48,13 @@ public class MemberListActivity extends BaseActivity {
             }
         });
 
-        recyclerView = (XRecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (SuperRecyclerView) findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setRefreshingColorResources(android.R.color.holo_orange_light, android.R.color.holo_blue_light, android.R.color.holo_green_light, android.R.color.holo_red_light);
         memberAdapter = new MemberAdapter();
+        memberAdapter.setHasStableIds(true);
         recyclerView.setAdapter(memberAdapter);
 
         recyclerView.addOnItemTouchListener(new RecyclerUtils.RecyclerItemClickListener(this, new RecyclerUtils.RecyclerItemClickListener.OnItemClickListener() {

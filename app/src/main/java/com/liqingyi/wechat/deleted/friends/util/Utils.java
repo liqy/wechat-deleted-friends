@@ -16,7 +16,22 @@
 
 package com.liqingyi.wechat.deleted.friends.util;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Class containing some static utility methods.
@@ -48,5 +63,63 @@ public class Utils {
 
     public static boolean hasKitKat() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    }
+
+    public static void saveImageToGallery(Context context, Bitmap bmp) {
+        // 首先保存图片
+        File appDir = new File(Environment.getExternalStorageDirectory(), "QRImage");
+        if (!appDir.exists()) {
+            appDir.mkdir();
+        } else {
+
+        }
+        String fileName = System.currentTimeMillis() + ".jpg";
+        File file = new File(appDir, fileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        // 其次把文件插入到系统图库
+//        try {
+//            MediaStore.Images.Media.insertImage(context.getContentResolver(),
+//                    file.getAbsolutePath(), fileName, null);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        // 最后通知图库更新
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + file.getAbsolutePath())));
+    }
+
+    /**
+     * Drawable转化为Bitmap
+     */
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, width, height);
+        drawable.draw(canvas);
+        return bitmap;
+
+    }
+
+    /**
+     * Bitmap to Drawable
+     *
+     * @param bitmap
+     * @param mcontext
+     * @return
+     */
+    public static Drawable bitmapToDrawble(Bitmap bitmap, Context mcontext) {
+        Drawable drawable = new BitmapDrawable(mcontext.getResources(), bitmap);
+        return drawable;
     }
 }
