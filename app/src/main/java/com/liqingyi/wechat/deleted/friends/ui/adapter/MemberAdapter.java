@@ -1,4 +1,4 @@
-package com.liqingyi.wechat.deleted.friends;
+package com.liqingyi.wechat.deleted.friends.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.liqingyi.wechat.deleted.friends.R;
 import com.liqingyi.wechat.deleted.friends.model.User;
 
 import java.util.ArrayList;
@@ -16,14 +17,28 @@ import java.util.ArrayList;
 public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder> {
 
     ArrayList<User> users;
+    ArrayList<User> members;
 
     public MemberAdapter() {
         this.users = new ArrayList<>();
+        this.members = new ArrayList<>();
     }
 
     public void addMember(ArrayList<User> list) {
         this.users.addAll(list);
         notifyDataSetChanged();
+    }
+
+    public ArrayList<User> getMembers() {
+        return members;
+    }
+
+    public void selectMember(int pos) {
+        this.members.add(this.users.get(pos));
+    }
+
+    public void resetMembers() {
+        this.members.clear();
     }
 
     @Override

@@ -9,7 +9,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ui.MemberListActivity">
 
+    <Button
+        android:id="@+id/createRoom"
+        android:text="创建聊天室"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <com.jcodecraeer.xrecyclerview.XRecyclerView
+        android:layout_below="@+id/createRoom"
         android:id="@+id/recyclerView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />

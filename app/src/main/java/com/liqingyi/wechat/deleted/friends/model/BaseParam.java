@@ -13,9 +13,14 @@ import java.util.ArrayList;
 public class BaseParam implements Parcelable {
     @SerializedName("BaseRequest")
     public BaseRequest baseRequest;
+
     public ArrayList<User> MemberList;
     public int MemberCount;
     public String Topic;
+
+    public String ChatRoomName;
+    public String DelMemberList;
+    public String AddMemberList;
 
     public BaseParam(BaseRequest baseRequest) {
         this.baseRequest = baseRequest;

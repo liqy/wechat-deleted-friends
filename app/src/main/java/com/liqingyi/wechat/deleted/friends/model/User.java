@@ -45,6 +45,11 @@ public class User implements Parcelable {
     public String KeyWord;
     public String EncryChatRoomId;
 
+    /**
+     * 4:被好友删除了
+     */
+    public String MemberStatus;
+
     @Override
     public String toString() {
         return "User{" +
@@ -56,6 +61,9 @@ public class User implements Parcelable {
                 ", UniFriend=" + UniFriend +
                 ", PYQuanPin='" + PYQuanPin + '\'' +
                 '}';
+    }
+
+    public User() {
     }
 
     @Override
@@ -96,9 +104,7 @@ public class User implements Parcelable {
         dest.writeInt(this.ChatRoomId);
         dest.writeString(this.KeyWord);
         dest.writeString(this.EncryChatRoomId);
-    }
-
-    public User() {
+        dest.writeString(this.MemberStatus);
     }
 
     protected User(Parcel in) {
@@ -133,9 +139,10 @@ public class User implements Parcelable {
         this.ChatRoomId = in.readInt();
         this.KeyWord = in.readString();
         this.EncryChatRoomId = in.readString();
+        this.MemberStatus = in.readString();
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         public User createFromParcel(Parcel source) {
             return new User(source);
         }

@@ -25,6 +25,13 @@ public class ResponseData implements Parcelable {
     public int ClickReportInterval;
     public int Seq;
 
+    public String Topic;
+    public String PYInitial;
+    public String QuanPin;
+    public String ChatRoomName;
+
+    public ResponseData() {
+    }
 
     @Override
     public int describeContents() {
@@ -48,9 +55,10 @@ public class ResponseData implements Parcelable {
         dest.writeInt(this.MPSubscribeMsgCount);
         dest.writeInt(this.ClickReportInterval);
         dest.writeInt(this.Seq);
-    }
-
-    public ResponseData() {
+        dest.writeString(this.Topic);
+        dest.writeString(this.PYInitial);
+        dest.writeString(this.QuanPin);
+        dest.writeString(this.ChatRoomName);
     }
 
     protected ResponseData(Parcel in) {
@@ -69,9 +77,13 @@ public class ResponseData implements Parcelable {
         this.MPSubscribeMsgCount = in.readInt();
         this.ClickReportInterval = in.readInt();
         this.Seq = in.readInt();
+        this.Topic = in.readString();
+        this.PYInitial = in.readString();
+        this.QuanPin = in.readString();
+        this.ChatRoomName = in.readString();
     }
 
-    public static final Parcelable.Creator<ResponseData> CREATOR = new Parcelable.Creator<ResponseData>() {
+    public static final Creator<ResponseData> CREATOR = new Creator<ResponseData>() {
         public ResponseData createFromParcel(Parcel source) {
             return new ResponseData(source);
         }
